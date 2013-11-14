@@ -1,0 +1,13 @@
+optimizer: GRADIENT_DESCENT
+stopcondition {
+  all_processed: false
+  steps: 300000
+}
+train: true
+batchsize: 128
+data_proto: "/home/mbrubake/Projects/map_prior/mass_roads/mass_roads.pbtxt"
+eval_after: 1000
+checkpoint_after: 10000
+checkpoint_directory: "/home/mbrubake/Projects/map_prior/mass_roads/tmp"
+randomize: true
+verbose: true

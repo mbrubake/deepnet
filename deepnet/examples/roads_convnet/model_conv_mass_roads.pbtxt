@@ -1,0 +1,155 @@
+name: "mass_roads_conv"
+model_type: FEED_FORWARD_NET
+layer {
+  name: "input_layer"
+  dimensions: 12288
+  is_input: true
+  hyperparams {
+    activation: LINEAR
+  }
+  data_field {
+    train: "train_data"
+    validation: "validation_data"
+  }
+  shape: 3
+  shape: 64 
+  shape: 64
+}
+layer {
+  name: "output_layer"
+  dimensions: 256
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+  is_output: true
+  loss_function: CROSS_ENTROPY
+  hyperparams {
+    dropout: false
+    activation: LOGISTIC 
+  }
+  data_field {
+    train: "train_labels"
+    validation: "validation_labels"
+  }
+  performance_stats {
+    compute_correct_preds: true
+    compute_cross_entropy: true
+  }
+}
+layer {
+  name: "hidden1"
+  dimensions: 10816 
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+}
+layer {
+  name: "hidden2"
+  dimensions: 11200
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+}
+layer {
+  name: "hidden3"
+  dimensions: 5120
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+}
+layer {
+  name: "hidden4"
+  dimensions: 4096
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+}
+edge {
+  node1: "input_layer"
+  node2: "hidden1"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN
+    sigma: 0.01
+    conv: true
+    conv_params {
+      size: 12
+      stride: 4
+      padding: 0
+      num_filters: 64
+      num_colors: 3
+      max_pool: true
+      pool_size: 2
+      pool_stride: 1
+    }
+  }
+}
+edge {
+  node1: "hidden1"
+  node2: "hidden2"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN
+    sigma: 0.01
+    conv: true
+    conv_params {
+      size: 4
+      stride: 1
+      padding: 0
+      num_filters: 112
+      num_colors: 64
+      max_pool: false
+    }
+  }
+}
+edge {
+  node1: "hidden2"
+  node2: "hidden3"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN
+    sigma: 0.01
+    conv: true
+    conv_params {
+      size: 3
+      stride: 1
+      padding: 0
+      num_filters: 80
+      num_colors: 112
+      max_pool: false
+    }
+  }
+}
+edge {
+  node1: "hidden3"
+  node2: "hidden4"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN_SQRT_FAN_IN
+    sigma: 1.0
+  }
+}
+edge {
+  node1: "hidden4"
+  node2: "output_layer"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN_SQRT_FAN_IN
+    sigma: 1.0
+  }
+}
+hyperparams {
+  base_epsilon: 0.00005
+  initial_momentum: 0.9
+  final_momentum: 0.15
+  momentum_change_steps: 300000
+  apply_l2_decay: true
+  l2_decay: 0.0002
+  activation: RECTIFIED_LINEAR
+}
+seed: 42

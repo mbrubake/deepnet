@@ -1,0 +1,48 @@
+name: "mass_roads"
+gpu_memory: "1.5G"
+main_memory: "16G"
+
+data {
+  name: "train_data"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/train/sat/*.tiff"
+  img: true
+  patchsize: 64
+  patchstride: 8
+  patchnormalize: true
+  patchrotate: true
+  dimensions: 12288
+  size: 35899200
+}
+data {
+  name: "train_labels"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/train/map/*.tif"
+  img: true
+  patchsize: 16
+  patchstride: 8
+  patchnormalize: false
+  patchrotate: true
+  dimensions: 256
+  size: 35899200
+}
+
+data {
+  name: "validation_data"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/valid/sat/*.tiff"
+  img: true
+  patchsize: 64
+  patchstride: 8
+  patchnormalize: true
+  dimensions: 12288 
+  size: 433664 
+}
+data {
+  name: "validation_labels"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/valid/map/*.tif"
+  img: true
+  patchsize: 16
+  patchstride: 8 
+  patchnormalize: false
+  dimensions: 256
+  size: 433664
+}
+
