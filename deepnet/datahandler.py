@@ -502,6 +502,10 @@ class DataHandler(object):
     filenames = []
     numdim_list = []
     datasetsize = None
+    patchsize = []
+    patchstride = 1
+    patchnormalize = []
+    patchrotation = False
     left_window = []
     right_window = []
     stats_files = []
@@ -518,6 +522,7 @@ class DataHandler(object):
     data_proto_file = os.path.join(op.data_proto_prefix, op.data_proto)
     dataset_proto = util.ReadData(data_proto_file)
     seq = False
+    img = False
     is_train = False
     for name, hyp in zip(data_name_list, hyperparameter_list):
       data_proto = next(d for d in dataset_proto.data if d.name == name)
@@ -528,7 +533,12 @@ class DataHandler(object):
       if not data_proto.sparse:
         numdims *= data_proto.num_labels
       numdim_list.append(numdims)
+      img = img or data_proto.img
       seq = seq or data_proto.seq
+      patchsize.append(data_proto.patchsize)
+      patchstride = np.max((patchstride,data_proto.patchstride))
+      patchnormalize.append(data_proto.patchnormalize)
+      patchrotation = patchrotation or data_proto.patchrotate
       left_window.append(hyp.left_window)
       right_window.append(hyp.right_window)
       add_noise.append(hyp.add_noise)
@@ -587,7 +597,19 @@ class DataHandler(object):
         print 'Batches in disk: %d + leftovers %d' % ((datasetsize / batchsize),
                                                       datasetsize % batchsize)
     
-    if seq:
+    if img:
+      import image_datahandler as img_dh
+        
+      self.disk = img_dh.DiskImage(filenames, numdim_list, 
+                                   patchsize, patchstride, patchnormalize, patchrotation)
+      self.cpu_cache = Cache(self.disk, cpu_capacity, numdim_list,
+                             typesize = typesize, randomize=randomize,
+                             verbose=self.verbose)
+      self.gpu_cache = GPUCache(self.cpu_cache, gpu_capacity, numdim_list,
+                                typesize = typesize, randomize=randomize,
+                                verbose=self.verbose, shift=shift, add_noise=add_noise,
+                                center_only=not is_train, shift_amt_x=shift_amt_x, shift_amt_y=shift_amt_y)
+    elif seq:
       import sequence_datahandler as seq_dh
       self.disk = seq_dh.SequenceDisk(
         filenames, numdim_list, datasetsize, keys=keys, left_window=left_window,
