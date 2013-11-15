@@ -119,13 +119,13 @@ class DiskImage(object):
                     for cdim in range(0,this_image.shape[2]):
                         spnd.interpolation.map_coordinates(this_image[:,:,cdim],patchCoords,output=patches[cdim,:,:],order=0)
                 else:
-                    patchCoords = patchPts.reshape((2,nPatchPts,1)) + patchCenters.reshape((2,1,nPatches))
+                    patchCoords = patchPts.reshape((2,nPatchPts,1)) + patchCenters[:,0:nPatches].reshape((2,1,nPatches))
                     for cdim in range(0,this_image.shape[2]):
                         patches[cdim,:,:] = this_image[patchCoords[0,...],patchCoords[1,...],cdim]
 
 
                 if cnorm:
-                    patches -= np.mean(patches,axis=1,keepdims=True)
+                    patches -= np.mean(patches,axis=1).reshape((this_image.shape[2],1,nPatches))
 
                 data[datasize:datasize+nPatches,:] = patches.reshape((-1,nPatches)).T
                 datasize += nPatches
