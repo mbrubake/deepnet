@@ -4,12 +4,14 @@ from itertools import product
 import numpy as np
 
 class DiskImage(object):
-    def __init__(self, imgnames, numdim_list, patchsize, patchstride, normalization, rotation):
+    def __init__(self, imgnames, validimgnames, numdim_list, patchsize, patchstride, normalization, rotation, randoff):
+        assert len(imgnames) == len(validimgnames)
         assert len(imgnames) == len(numdim_list)
         assert len(imgnames) == len(patchsize)
         assert len(imgnames) == len(normalization)
         self.num_data = len(imgnames)
         self.imgnames = imgnames
+        self.validimgnames = validimgnames
         self.patchsize = patchsize
         self.patchstride = patchstride
         self._num_file_list = [len(filename_list) for filename_list in imgnames]
@@ -17,11 +19,13 @@ class DiskImage(object):
         self.maxpatchsize = np.max(self.patchsize)
         self.normalization = normalization
         self.rotation = rotation
+        self.randoff = randoff
 
         self.numdim_list = [None]*self.num_data
         self.data = [None]*self.num_data
         self.last_read_patch = [None]*self.num_data
         self.last_read_image = [None]*self.num_data
+        self.last_read_valid= [None]*self.num_data
         self.last_read_imgnum = [-1]*self.num_data
         self.last_read_img_npatches = [-1]*self.num_data
         current_file = 0
@@ -48,6 +52,11 @@ class DiskImage(object):
         if current_file == None:
             current_file = self.last_read_imgnum[i]
 
+        if self.validimgnames[i] != None and self.validimgnames[i][current_file] != None:
+            valid_image = misc.imread(self.validimgnames[i][current_file])
+        else:
+            valid_image = None
+
         this_image = misc.imread(self.imgnames[i][current_file])
 
         if this_image.ndim == 2:
@@ -63,9 +72,16 @@ class DiskImage(object):
             maxunrotpatchsz = self.maxpatchsize
  
         self.last_read_image[i] = this_image
+        self.last_read_valid[i] = valid_image
         self.last_read_imgnum[i] = current_file
-        range1 = range(maxunrotpatchsz/2,this_image.shape[0] - maxunrotpatchsz + 1,self.patchstride)
-        range2 = range(maxunrotpatchsz/2,this_image.shape[1] - maxunrotpatchsz + 1,self.patchstride)
+        if self.randoff:
+            startx = np.random.randint(maxunrotpatchsz/2,self.maxpatchsize+1)
+            starty = np.random.randint(maxunrotpatchsz/2,self.maxpatchsize+1)
+        else:
+            startx = maxunrotpatchsz/2
+            starty = maxunrotpatchsz/2
+        range1 = range(startx,this_image.shape[0] - maxunrotpatchsz/2 + 1,self.patchstride)
+        range2 = range(starty,this_image.shape[1] - maxunrotpatchsz/2 + 1,self.patchstride)
         self.last_read_patch[i] = product(range1,range2)
         self.last_read_img_npatches[i] = len(range1)*len(range2)
  
@@ -99,15 +115,17 @@ class DiskImage(object):
                 self.LoadImage(i,current_file)
 
                 this_image = self.last_read_image[i]
+                valid_image = self.last_read_valid[i]
 
                 # Get the patch center coordinates
                 nPatches = 0
                 for (x,y) in self.last_read_patch[i]:
-                    patchCenters[0,nPatches] = x
-                    patchCenters[1,nPatches] = y
-                    nPatches += 1
-                    if nPatches == patchCenters.shape[1] or nPatches == batchsize - datasize:
-                        break
+                    if valid_image == None or valid_image[x,y]:
+                        patchCenters[0,nPatches] = x
+                        patchCenters[1,nPatches] = y
+                        nPatches += 1
+                        if nPatches == patchCenters.shape[1] or nPatches == batchsize - datasize:
+                            break
 
                 patches = np.empty((this_image.shape[2],nPatchPts,nPatches),dtype=np.float32)
                 if self.rotation:

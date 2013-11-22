@@ -1,0 +1,85 @@
+name: "mass_roads_crop"
+gpu_memory: "1G"
+main_memory: "16G"
+
+data {
+  name: "train_data"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/sat/*.png"
+  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/val/*.png"
+  img: true
+  patchsize: 64
+  patchstride: 16
+  patchnormalize: true
+  patchrotate: true
+  patchrandoffset: true
+  dimensions: 12288
+  size: 2242592
+}
+data {
+  name: "train_labels"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/map/*.png"
+  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/val/*.png"
+  img: true
+  patchsize: 16
+  patchstride: 16
+  patchnormalize: false
+  patchrotate: true
+  patchrandoffset: true
+  dimensions: 256
+  size: 2242592
+}
+
+data {
+  name: "validation_data"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/sat/*.png"
+  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/val/*.png"
+  img: true
+  patchsize: 64
+  patchstride: 16
+  patchnormalize: true
+  patchrotate: false 
+  patchrandoffset: false
+  dimensions: 12288 
+  size: 113400
+}
+data {
+  name: "validation_labels"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/map/*.png"
+  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/val/*.png"
+  img: true
+  patchsize: 16
+  patchstride: 16 
+  patchnormalize: false
+  patchrotate: false
+  patchrandoffset: false
+  dimensions: 256
+  size: 113400
+}
+
+data {
+  name: "test_data"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/sat/*.png"
+  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/val/*.png"
+  img: true
+  patchsize: 64
+  patchstride: 16
+  patchnormalize: true
+  patchrotate: false
+  patchrandoffset: false
+  dimensions: 12288 
+  size: 396900
+}
+data {
+  name: "test_labels"
+  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/map/*.png"
+  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/val/*.png"
+  img: true
+  patchsize: 16
+  patchstride: 16
+  patchnormalize: false
+  patchrotate: false
+  patchrandoffset: false
+  dimensions: 256
+  size: 396900
+}
+
