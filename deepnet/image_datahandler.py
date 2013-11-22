@@ -127,6 +127,11 @@ class DiskImage(object):
                         if nPatches == patchCenters.shape[1] or nPatches == batchsize - datasize:
                             break
 
+                if nPatches == 0:
+                    current_file = (current_file + 1) % num_files
+                    continue
+                
+
                 patches = np.empty((this_image.shape[2],nPatchPts,nPatches),dtype=np.float32)
                 if self.rotation:
                     patchCoords = np.dot(rots[:,:,datasize:datasize+nPatches].transpose((2,0,1)), \
