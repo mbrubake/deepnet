@@ -500,12 +500,14 @@ class DataHandler(object):
       frac: What fraction of the total memory should this data handler use.
     """
     filenames = []
+    valid_filenames = []
     numdim_list = []
     datasetsize = None
     patchsize = []
     patchstride = 1
     patchnormalize = []
     patchrotation = False
+    patchrandoffset = False
     left_window = []
     right_window = []
     stats_files = []
@@ -527,7 +529,11 @@ class DataHandler(object):
     for name, hyp in zip(data_name_list, hyperparameter_list):
       data_proto = next(d for d in dataset_proto.data if d.name == name)
       file_pattern = os.path.join(dataset_proto.prefix, data_proto.file_pattern)
+      valid_file_pattern = os.path.join(dataset_proto.prefix, data_proto.valid_file_pattern)
+      print file_pattern
+      print valid_file_pattern
       filenames.append(sorted(glob.glob(file_pattern)))
+      valid_filenames.append(sorted(glob.glob(valid_file_pattern)))
       stats_files.append(os.path.join(dataset_proto.prefix, data_proto.stats_file))
       numdims = np.prod(np.array(data_proto.dimensions))
       if not data_proto.sparse:
@@ -539,6 +545,7 @@ class DataHandler(object):
       patchstride = np.max((patchstride,data_proto.patchstride))
       patchnormalize.append(data_proto.patchnormalize)
       patchrotation = patchrotation or data_proto.patchrotate
+      patchrandoffset = patchrandoffset or data_proto.patchrotate
       left_window.append(hyp.left_window)
       right_window.append(hyp.right_window)
       add_noise.append(hyp.add_noise)
@@ -600,8 +607,8 @@ class DataHandler(object):
     if img:
       import image_datahandler as img_dh
         
-      self.disk = img_dh.DiskImage(filenames, numdim_list, 
-                                   patchsize, patchstride, patchnormalize, patchrotation)
+      self.disk = img_dh.DiskImage(filenames, valid_filenames, numdim_list, 
+                                   patchsize, patchstride, patchnormalize, patchrotation, patchrandoffset)
       self.cpu_cache = Cache(self.disk, cpu_capacity, numdim_list,
                              typesize = typesize, randomize=randomize,
                              verbose=self.verbose)

@@ -287,6 +287,13 @@ message Dataset {
     optional bool sparse = 7 [default=false];
     optional bool seq = 8 [default=false];
     optional string stats_file = 9;
+    optional bool img = 10 [default=false];
+    optional string valid_file_pattern = 11;
+    optional int32 patchsize = 12;
+    optional int32 patchstride = 13;
+    optional bool patchnormalize = 14 [default=false];
+    optional bool patchrotate = 15 [default=false];
+    optional bool patchrandoffset = 16 [default=false];
   }
   repeated Data data = 2;
   optional string gpu_memory = 3 [default="2G"];
