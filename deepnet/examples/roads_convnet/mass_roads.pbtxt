@@ -1,5 +1,5 @@
 name: "mass_roads"
-gpu_memory: "1.5G"
+gpu_memory: "1G"
 main_memory: "16G"
 
 data {
