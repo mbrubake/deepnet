@@ -140,7 +140,7 @@ class DiskImage(object):
                                   + patchCenters[:,0:nPatches].reshape((2,1,nPatches)) + 0.5
 
                     for cdim in range(0,this_image.shape[2]):
-                        spnd.interpolation.map_coordinates(this_image[:,:,cdim],patchCoords,output=patches[cdim,:,:],order=0)
+                        spnd.interpolation.map_coordinates(this_image[:,:,cdim].T,patchCoords,output=patches[cdim,:,:],order=0)
                 else:
                     patchCoords = patchPts.reshape((2,nPatchPts,1)) + patchCenters[:,0:nPatches].reshape((2,1,nPatches))
                     for cdim in range(0,this_image.shape[2]):
@@ -150,7 +150,7 @@ class DiskImage(object):
                 if cnorm:
                     patches -= np.mean(patches,axis=1).reshape((this_image.shape[2],1,nPatches))
 
-                data[datasize:datasize+nPatches,:] = patches.reshape((-1,nPatches)).T
+                data[datasize:datasize+nPatches,:] = patches.transpose((2,1,0)).reshape((nPatches,-1))
                 datasize += nPatches
                 if datasize >= batchsize:
                     break
