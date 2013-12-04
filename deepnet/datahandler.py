@@ -8,6 +8,7 @@ import os.path
 import scipy.sparse as sp
 import pdb
 import gzip
+import bz2
 import random
 
 class Disk(object):
@@ -156,11 +157,15 @@ class Disk(object):
 
   def ReadDiskData(self, filename, key=''):
     """Reads data from filename."""
-    if self.verbose:
-      print 'Reading from disk %s' % filename
+#    if self.verbose:
+#      print 'Reading from disk %s' % filename
     ext = os.path.splitext(filename)[1]
     if ext == '.npy':
       data = np.load(filename)
+    elif ext == '.npgz':
+      data = np.load(gzip.GzipFile(filename,'rb'))
+    elif ext == '.npbz2':
+      data = np.load(bz2.BZ2File(filename,'rb'))
     elif ext == '.mat':
       data = scipy.io.loadmat(filename, struct_as_record = True)[key]
     elif ext == '.p':
@@ -470,7 +475,8 @@ def GetDataHandles(op, names, hyp_list, verbose=False):
         size += datasetsize * numdims * typesize
       size_list.append(size)
     total_size = sum(size_list)
-    proportions = [float(size)/total_size for size in size_list]
+#    proportions = [float(size)/total_size for size in size_list]
+    proportions = [np.sqrt(float(size))/sum(np.sqrt(np.array(size_list,dtype=np.float64))) for size in size_list]
     for i, name_list in enumerate(names):
       if name_list == []:
         handlers.append(None)
@@ -530,8 +536,6 @@ class DataHandler(object):
       data_proto = next(d for d in dataset_proto.data if d.name == name)
       file_pattern = os.path.join(dataset_proto.prefix, data_proto.file_pattern)
       valid_file_pattern = os.path.join(dataset_proto.prefix, data_proto.valid_file_pattern)
-      print file_pattern
-      print valid_file_pattern
       filenames.append(sorted(glob.glob(file_pattern)))
       valid_filenames.append(sorted(glob.glob(valid_file_pattern)))
       stats_files.append(os.path.join(dataset_proto.prefix, data_proto.stats_file))

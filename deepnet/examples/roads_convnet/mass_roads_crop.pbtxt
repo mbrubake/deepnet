@@ -4,8 +4,8 @@ main_memory: "16G"
 
 data {
   name: "train_data"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/sat/*.png"
-  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/val/*.png"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/train/sat/*.png"
+  valid_file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/train/val/*.png"
   img: true
   patchsize: 64
   patchstride: 16
@@ -17,8 +17,8 @@ data {
 }
 data {
   name: "train_labels"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/map/*.png"
-  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/train/val/*.png"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/train/map/*.png"
+  valid_file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/train/val/*.png"
   img: true
   patchsize: 16
   patchstride: 16
@@ -31,8 +31,8 @@ data {
 
 data {
   name: "validation_data"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/sat/*.png"
-  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/val/*.png"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/valid/sat/*.png"
+  valid_file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/valid/val/*.png"
   img: true
   patchsize: 64
   patchstride: 16
@@ -44,8 +44,8 @@ data {
 }
 data {
   name: "validation_labels"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/map/*.png"
-  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/valid/val/*.png"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/valid/map/*.png"
+  valid_file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/valid/val/*.png"
   img: true
   patchsize: 16
   patchstride: 16 
@@ -58,8 +58,8 @@ data {
 
 data {
   name: "test_data"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/sat/*.png"
-  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/val/*.png"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/test/sat/*.png"
+  valid_file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/test/val/*.png"
   img: true
   patchsize: 64
   patchstride: 16
@@ -71,8 +71,8 @@ data {
 }
 data {
   name: "test_labels"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/map/*.png"
-  valid_file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_crop/test/val/*.png"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/test/map/*.png"
+  valid_file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads_crop/test/val/*.png"
   img: true
   patchsize: 16
   patchstride: 16
