@@ -1,0 +1,13 @@
+optimizer: GRADIENT_DESCENT
+stopcondition {
+  all_processed: false
+  steps: 300000
+}
+train: true
+batchsize: 128 
+data_proto: "mass_roads_patches.pbtxt"
+eval_after: 100
+checkpoint_after: 10000
+checkpoint_directory: "/home/mbrubake/Projects/map_prior/checkpoints"
+randomize: true
+verbose: true
