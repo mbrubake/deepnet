@@ -148,7 +148,7 @@ class DiskImage(object):
 
 
                 if cnorm:
-                    patches -= np.mean(patches,axis=1).reshape((this_image.shape[2],1,nPatches))
+                    patches -= np.mean(np.mean(patches,axis=1),axis=0).reshape((1,1,nPatches))
 
                 data[datasize:datasize+nPatches,:] = patches.transpose((2,1,0)).reshape((nPatches,-1))
                 datasize += nPatches
