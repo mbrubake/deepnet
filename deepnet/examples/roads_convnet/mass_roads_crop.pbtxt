@@ -1,6 +1,6 @@
 name: "mass_roads_crop"
-gpu_memory: "1G"
-main_memory: "16G"
+gpu_memory: "4G"
+main_memory: "64G"
 
 data {
   name: "train_data"
@@ -13,7 +13,7 @@ data {
   patchrotate: true
   patchrandoffset: true
   dimensions: 12288
-  size: 2242592
+  size: 8568832
 }
 data {
   name: "train_labels"
@@ -26,7 +26,7 @@ data {
   patchrotate: true
   patchrandoffset: true
   dimensions: 256
-  size: 2242592
+  size: 8568832
 }
 
 data {

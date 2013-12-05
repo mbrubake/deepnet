@@ -1,5 +1,6 @@
 name: "mass_roads_conv"
 model_type: FEED_FORWARD_NET
+
 layer {
   name: "input_layer"
   dimensions: 12288
@@ -10,7 +11,7 @@ layer {
   data_field {
     train: "train_data"
     validation: "validation_data"
-    test: "test_data"
+#    test: "test_data"
   }
   shape: 64 
   shape: 64
@@ -32,35 +33,49 @@ layer {
   data_field {
     train: "train_labels"
     validation: "validation_labels"
-    test: "test_labels"
+#    test: "test_labels"
   }
   performance_stats {
     compute_correct_preds: true
     compute_cross_entropy: true
   }
+  shape: 16 
+  shape: 16
 }
 layer {
   name: "hidden1"
-  dimensions: 10816 
+  dimensions: 9216
   param {
     name: "bias"
     initialization: CONSTANT
+  }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
   }
 }
 layer {
   name: "hidden2"
-  dimensions: 11200
+  dimensions: 9072
   param {
     name: "bias"
     initialization: CONSTANT
   }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
+  }
 }
 layer {
   name: "hidden3"
-  dimensions: 5120
+  dimensions: 3920
   param {
     name: "bias"
     initialization: CONSTANT
+  }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
   }
 }
 layer {
@@ -69,6 +84,10 @@ layer {
   param {
     name: "bias"
     initialization: CONSTANT
+  }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
   }
 }
 edge {
@@ -80,7 +99,7 @@ edge {
     sigma: 0.01
     conv: true
     conv_params {
-      size: 12
+      size: 16
       stride: 4
       padding: 0
       num_filters: 64
@@ -145,16 +164,17 @@ edge {
     sigma: 1.0
   }
 }
+
 hyperparams {
-#  base_epsilon: 0.00005
-  base_epsilon: 0.01
-  epsilon_decay: INVERSE_T
-  epsilon_decay_half_life: 5000
+  base_epsilon: 0.0005
+  epsilon_decay: EXPONENTIAL
+  epsilon_decay_half_life: 120000
   initial_momentum: 0.9
-  final_momentum: 0.15
+  final_momentum: 0.9
   momentum_change_steps: 300000
   apply_l2_decay: true
   l2_decay: 0.0002
   activation: RECTIFIED_LINEAR
 }
 seed: 42
+

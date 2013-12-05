@@ -119,6 +119,7 @@ class Layer(Parameter):
         self.outgoing_neighbour.append(edge.node1)
 
   def PrintNeighbours(self):
+    print "Activation: {0}".format(self.activation)
     for n in self.incoming_neighbour:
       print "Incoming edge from %s" % n.name
     for n in self.outgoing_neighbour:

@@ -40,7 +40,7 @@ class LogisticLayer(Layer):
       perf.cross_entropy = temp1.sum()
    
       cm.correct_preds(data, state, target=temp1, cutoff=0.5)
-      perf.correct_preds = temp1.sum()
+      perf.correct_preds = temp1.sum() / self.dimensions
 
       if get_deriv:
         self.state.subtract(self.data, target=self.deriv)
