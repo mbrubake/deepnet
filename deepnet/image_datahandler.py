@@ -161,7 +161,7 @@ class DiskImage(object):
 
                 t = time.time()
                 if cnorm:
-                    patches -= np.mean(patches,axis=1).reshape((this_image.shape[2],1,nPatches))
+                    patches -= np.mean(np.mean(patches,axis=0),axis=0).reshape((1,1,nPatches))
                 self._time_norm += time.time() - t
 
                 t = time.time()
