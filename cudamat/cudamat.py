@@ -1798,6 +1798,25 @@ def cross_entropy_bernoulli(mat, p, target = None, tiny=1e-10):
 
     return target
 
+def cross_entropy_bernoulli_deriv(mat, p, target = None, tiny=1e-10):
+    """
+    Compute derivative of -mat*log(p) - (1-mat).*log(1-p) w.r.t. p
+    """
+
+    if not target:
+        target = mat
+
+    if isinstance(p, CUDAMatrix):
+        err_code = _cudamat.compute_cross_entropy_bernoulli_deriv(mat.p_mat, p.p_mat, target.p_mat, ct.c_float(tiny))
+    else:
+        raise ValueError, "Value must be of type CUDAMatrix."
+
+    if err_code:
+        raise generate_exception(err_code)
+
+    return target
+
+
 
 def cross_entropy(mat, p, target = None, tiny=1e-10):
     """

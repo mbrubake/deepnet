@@ -43,13 +43,15 @@ if __name__ == '__main__':
     cmdLineParser = OptionParser()
     cmdLineParser.add_option('--sat_patch_size',type='int',dest='sat_patch_size',default=64)
     cmdLineParser.add_option('--map_patch_size',type='int',dest='map_patch_size',default=16)
+    cmdLineParser.add_option('--dilate_map',type='int',dest='dilate_map',default=0)
     cmdLineParser.add_option('--patch_stride',type='int',dest='patch_stride',default=16)
     cmdLineParser.add_option('--num_batches',type='int',dest='num_batches',default=1)
+    cmdLineParser.add_option('--set_start_num',type='int',dest='set_start_num',default=1)
     cmdLineParser.add_option('--patches_per_file',type='int',dest='patches_per_file',default=2**14)
     cmdLineParser.add_option('--randrot',type='int',dest='randrot',default=False)
     cmdLineParser.add_option('--randoff',type='int',dest='randoff',default=False)
     cmdLineParser.add_option('--randorder',type='int',dest='randorder',default=False)
-    cmdLineParser.add_option('--patch_norm',type='int',dest='patch_norm',default=False)
+    cmdLineParser.add_option('--patch_norm',type='int',dest='patch_norm',default=True)
     cmdLineParser.add_option('--output',type='string',dest='output',default='npgz')
     cmdLineParser.add_option('--stats_file',type='string',dest='stats_file',default=None)
 
@@ -80,7 +82,10 @@ if __name__ == '__main__':
     map_patchset = np.empty((options.patches_per_file,nMapPatchPts),dtype=np.uint8)
     sat_patchset = np.empty((options.patches_per_file,3*nSatPatchPts),dtype=np.float32)
     nextPatchSetNum = 0
-    currSetNum = 0
+    currSetNum = options.set_start_num
+
+    num_outputs = 0
+    num_road_outputs = 0
 
     totalNumDataPts = 0
 
@@ -97,10 +102,17 @@ if __name__ == '__main__':
             assert os.path.splitext(os.path.split(satimFile)[1])[0] == os.path.splitext(os.path.split(mapimFile)[1])[0]
 #            print '\nImage: {0}'.format(os.path.split(satimFile)[1])
             satim = (misc.imread(satimFile).astype('float32') / 255.0) - 0.5
-            mapim = misc.imread(mapimFile).astype('float32') / 255.0
-            valim = np.logical_not(
+            valim = np.logical_not(\
                         morph.binary_dilation(\
-                            morph.binary_erosion(np.all(satim > 253.0/255.0,axis=2),iterations=8),iterations=16))
+                            morph.binary_erosion(np.all(satim > 253.0/255.0,axis=2),iterations=8),iterations=8+maxpatchsize/2))
+            mapim = misc.imread(mapimFile)
+            if options.dilate_map:
+                mapim = morph.binary_dilation(mapim,iterations=options.dilate_map)
+            mapim = mapim.astype('float32') / 255.0
+
+            # Update statistics
+            num_outputs += np.sum(valim)
+            num_road_outputs += np.sum(mapim[valim])
 
             if options.randoff:
                 startx = np.random.randint(maxunrotpatchsz/2,maxpatchsize+1)
@@ -142,10 +154,10 @@ if __name__ == '__main__':
 
             if options.patch_norm:
                 # Mean normalize satellite patches
-                sat_patches -= np.mean(sat_patches,axis=(0,1).reshape((1,1,nPatches))
+                sat_patches -= np.mean(sat_patches,axis=(0,1)).reshape((1,1,nPatches))
 
             # Add patches to patch set
-            nCurrPatches = min((nPatches,options.patches_per_file - nextPatchSetNum))
+            nCurrPatches = min(nPatches,options.patches_per_file - nextPatchSetNum)
             map_patchset[nextPatchSetNum:nextPatchSetNum+nCurrPatches,:] = map_patches[:,:nCurrPatches].reshape((-1,nCurrPatches)).T
             sat_patchset[nextPatchSetNum:nextPatchSetNum+nCurrPatches,:] = sat_patches[:,:,:nCurrPatches].reshape((-1,nCurrPatches)).T
             nextPatchSetNum += nCurrPatches
@@ -155,8 +167,7 @@ if __name__ == '__main__':
                 sat_stats.write_stats(options.stats_file)
 
             if nextPatchSetNum == options.patches_per_file or (batchnum == options.num_batches-1 and file_ind == len(fileList)-1):
-                currSetNum += 1
-                print 'Saving set number {0} ({1} data points so far)'.format(currSetNum, totalNumDataPts + nextPatchSetNum)
+                print 'Saving set number {0} (so far: {1} patches, {2}% roads)'.format(currSetNum, totalNumDataPts + nextPatchSetNum, 100.0*num_road_outputs/num_outputs)
                 if options.randorder:
                     out_map = map_patchset[np.random.permutation(nextPatchSetNum),:]
                     out_sat = sat_patchset[np.random.permutation(nextPatchSetNum),:]
@@ -182,6 +193,8 @@ if __name__ == '__main__':
                 else:
                     assert False, 'Unknown output type: ' + options.output
 
+                currSetNum += 1
+
                 totalNumDataPts += nextPatchSetNum
 
                 nextPatchSetNum = 0
@@ -190,104 +203,7 @@ if __name__ == '__main__':
                     sat_patchset[:(nPatches-nCurrPatches),:] = sat_patches[:,:,nCurrPatches:].reshape((-1,nPatches-nCurrPatches)).T
                     nextPatchSetNum = nPatches-nCurrPatches
 
-    print 'Dumped {0} sets with {1} datapoints to {2}'.format(currSetNum,totalNumDataPts,outdir)
+    print 'Dumped {0} sets with {1} datapoints to {2}'.format(currSetNum-1,totalNumDataPts,outdir)
 
     raw_input('Waiting to exit...')
-
-if 0:
-#if __name__ == '__main__':
-    cmdLineParser = OptionParser()
-    cmdLineParser.add_option('--patch_size',type='int',dest='patch_size',default=64)
-    cmdLineParser.add_option('--patch_stride',type='int',dest='patch_stride',default=8)
-    cmdLineParser.add_option('--im_start',type='int',dest='im_start',default=0)
-
-    (options, args) = cmdLineParser.parse_args()
-
-    indir = args[0];
-    outfile_base = args[1];
-    sat_filelist = sorted(glob('{0}/sat/*.tiff'.format(indir)))
-    map_filelist = sorted(glob('{0}/map/*.tif'.format(indir)))
-    for (file_ind,(satimFile,mapimFile)) in enumerate(zip(sat_filelist,map_filelist)):
-        print 'Satellite: {0}\nMap: {1}'.format(satimFile,mapimFile);
-        t = time.time()
-        satim = misc.imread(satimFile).astype(np.float32) / 255.0
-        print 'Time spent loading image: {0}s'.format(time.time() - t)
-#        mapim = misc.imread(mapimFile)
-
-#        num_patches = np.ceil((satim.shape[0] - options.im_start)/options.patch_stride) * np.ceil((satim.shape[1] - options.im_start)/options.patch_stride)
-#        imData = np.empty([satim.shape[2]*options.patch_size**2, num_patches],np.uint8)
-#        mapData = np.empty([num_patches],np.uint8)
-        patchCenters = np.mgrid[options.im_start + int(np.sqrt(2.0)*options.patch_size/2.0) : satim.shape[0]-2*options.patch_size : options.patch_stride,
-                                options.im_start + int(np.sqrt(2.0)*options.patch_size/2.0) : satim.shape[1]-2*options.patch_size : options.patch_stride].reshape((2,1,-1))
-        patchCenters += 0.5
-        nPatches = patchCenters.shape[2]
-        nPatchPts = options.patch_size**2
-
-        t = time.time()
-        patchPts = np.mgrid[-options.patch_size/2:options.patch_size/2,
-                            -options.patch_size/2:options.patch_size/2].reshape((2,nPatchPts))
-        print 'Time spent getting patch points: {0}s'.format(time.time() - t)
-        
-        cangles = 2.0*np.pi*np.random.rand(nPatches)
-        t = time.time()
-        rots = np.array([[ np.cos(cangles), np.sin(cangles)],
-                         [-np.sin(cangles), np.cos(cangles)]],dtype=np.float64).transpose((2,0,1))
-        print 'Time spent constructing rotations: {0}s'.format(time.time() - t)
-        
-        t = time.time()
-        patchCoords = np.dot(rots, \
-                             patchPts.reshape((1,2,nPatchPts))).reshape((nPatches,2,nPatchPts)) \
-                                                               .transpose((1,2,0)) \
-                      + patchCenters.reshape((2,1,nPatches))
-        print 'Time spent computing patch coordinates: {0}s'.format(time.time() - t)
-
-        t = time.time()
-        patches = np.empty((satim.shape[2],nPatchPts,nPatches),dtype=np.float32)
-        for cdim in range(0,satim.shape[2]):
-            spnd.interpolation.map_coordinates(satim[:,:,cdim],patchCoords,output=patches[cdim,:,:],order=0);
-        print 'Time spent interpolating: {0}s'.format(time.time() - t)
-
-        for i in range(0,nPatches):
-            cpatch = patches[:,:,i].transpose().reshape((options.patch_size,options.patch_size,-1))
-            x = patchCenters[0,0,i]
-            y = patchCenters[1,0,i]
-            satPatch = satim[x - options.patch_size/2 : x + options.patch_size/2,
-                             y - options.patch_size/2 : y + options.patch_size/2]
-            plt.figure(1)
-            plt.imshow(satPatch)
-            plt.figure(2)
-            plt.imshow(cpatch)
-            plt.show()
-
-        i = 0;
-        for x in range(options.im_start + int(np.sqrt(2.0)*options.patch_size/2.0),satim.shape[0]-2*options.patch_size,options.patch_stride):
-            for y in range(options.im_start + int(np.sqrt(2.0)*options.patch_size/2.0),satim.shape[1]-2*options.patch_size,options.patch_stride):
-                satPatch = satim[x - options.patch_size/2 : x + options.patch_size/2,
-                                 y - options.patch_size/2 : y + options.patch_size/2]
-#                cangle = 2.0*np.pi*np.random.rand()
-                cangle = np.pi/4
-                cpatchsz = options.patch_size
-                matrix = np.array([[ np.cos(cangle), np.sin(cangle), 0],
-                                   [-np.sin(cangle), np.cos(cangle), 0],
-                                   [              0,              0, 1]],dtype=np.float64)
-                offset = np.zeros((3,),dtype=np.float64)
-                offset[0] = float(cpatchsz)/2.0 - 0.5
-                offset[1] = float(cpatchsz)/2.0 - 0.5
-                offset = np.dot(matrix,offset)
-                offset[0] = x - 0.5 - offset[0]
-                offset[1] = y - 0.5 - offset[1]
-                cpatch = spnd.interpolation.affine_transform(satim,matrix,offset,(cpatchsz,cpatchsz,3))
-
-#                mapVal = mapim[x + options.patch_size/2,y + options.patch_size/2]
-#                imData[:,i] = satPatch.flat
-#                mapData[i] = mapVal != 0
-#                i += 1
-                plt.figure(1)
-                plt.imshow(satPatch)
-                plt.figure(2)
-                plt.imshow(cpatch)
-                plt.show()
-#        print 'i = {0}, num_patches = {1}\n'.format(i,num_patches)
-#        np.save('{0}_{1}_data.npy'.format(outfile_base,file_ind),imData[:,:i])
-#        np.save('{0}_{1}_labels.npy'.format(outfile_base,file_ind),imData[:,:i])
 

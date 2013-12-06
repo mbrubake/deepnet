@@ -77,6 +77,7 @@ __global__ void kPow(float* mat, float pow, float* target, unsigned int len);
 __global__ void kPowMatrix(float* mat, float* pow, float* target, unsigned int len);
 __global__ void kCrossEntropy(float* mat, float* p, float* target, unsigned int len, float tiny);
 __global__ void kCrossEntropyBernoulli(float* mat, float* p, float* target, unsigned int len, float tiny);
+__global__ void kCrossEntropyBernoulliDeriv(float* mat, float* p, float* target, unsigned int len, float tiny);
 __global__ void kCorrectPreds(float* mat, float* p, float* target, unsigned int len, float cutoff);
 __global__ void kReciprocal(float* mat, float* target, unsigned int len);
 __global__ void kAddDiagonal(float* mat, float* vec, float* tgtMat, unsigned int width);

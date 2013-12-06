@@ -1627,6 +1627,29 @@ extern int compute_cross_entropy_bernoulli(cudamat* mat, cudamat* pow, cudamat* 
 
     return 0;
 }
+
+extern int compute_cross_entropy_bernoulli_deriv(cudamat* mat, cudamat* pow, cudamat* target, float tiny) {
+    unsigned int len = mat->size[0] * mat->size[1];
+
+    if (!mat->on_device || !target->on_device)
+        return ERROR_NOT_ON_DEVICE;
+
+    if (mat->size[0] != target->size[0] || mat->size[1] != target->size[1])
+        return ERROR_INCOMPATIBLE_DIMENSIONS;
+
+    if (mat->size[0] != pow->size[0] || mat->size[1] != pow->size[1])
+        return ERROR_INCOMPATIBLE_DIMENSIONS;
+
+    kCrossEntropyBernoulliDeriv<<<NUM_VECTOR_OP_BLOCKS,NUM_VECTOR_OP_THREADS_PER_BLOCK>>>(mat->data_device, pow->data_device, target->data_device, len, tiny);
+
+    cudaThreadSynchronize();
+
+    if (checkCUDAError())
+        return CUDA_ERROR;
+
+    return 0;
+}
+
 extern int correct_preds(cudamat* mat, cudamat* pow, cudamat* target, float cutoff) {
     unsigned int len = mat->size[0] * mat->size[1];
 

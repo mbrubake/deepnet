@@ -48,7 +48,6 @@ class Edge(Parameter):
     if not self.hyperparams.enable_display:
       return
     visualize.show_hist(self.params['weight'].asarray(), self.fig)
-    """
     if self.node1.is_input:
       if self.conv or self.local:
         visualize.display_convw(self.params['weight'].asarray(),
@@ -73,7 +72,6 @@ class Edge(Parameter):
                                   self.proto.display_rows,
                                   self.proto.display_cols, self.fig,
                                   title=self.name)
-    """
 
   def AllocateBatchsizeDependentMemory(self):
     for param in self.proto.param:

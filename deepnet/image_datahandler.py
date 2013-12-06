@@ -2,6 +2,7 @@ from scipy import misc
 from scipy import ndimage as spnd
 from itertools import product
 import numpy as np
+import time
 
 class DiskImage(object):
     def __init__(self, imgnames, validimgnames, numdim_list, patchsize, patchstride, normalization, rotation, randoff):
@@ -20,6 +21,12 @@ class DiskImage(object):
         self.normalization = normalization
         self.rotation = rotation
         self.randoff = randoff
+
+        self._time_load = 0
+        self._time_coord = 0
+        self._time_warp = 0
+        self._time_norm = 0
+        self._time_copy = 0
 
         self.numdim_list = [None]*self.num_data
         self.data = [None]*self.num_data
@@ -49,6 +56,7 @@ class DiskImage(object):
             assert(self.numdim_list[i] == numdim_list[i])
             
     def LoadImage(self,i,current_file = None):
+        t = time.time()
         if current_file == None:
             current_file = self.last_read_imgnum[i]
 
@@ -84,7 +92,8 @@ class DiskImage(object):
         range2 = range(starty,this_image.shape[1] - maxunrotpatchsz/2 + 1,self.patchstride)
         self.last_read_patch[i] = product(range1,range2)
         self.last_read_img_npatches[i] = len(range1)*len(range2)
- 
+        self._time_load += time.time() - t
+
     def Get(self, batchsize):
         data_list = []
         if self.rotation:
@@ -118,6 +127,7 @@ class DiskImage(object):
                 valid_image = self.last_read_valid[i]
 
                 # Get the patch center coordinates
+                t = time.time()
                 nPatches = 0
                 for (x,y) in self.last_read_patch[i]:
                     if valid_image == None or valid_image[x,y]:
@@ -130,9 +140,11 @@ class DiskImage(object):
                 if nPatches == 0:
                     current_file = (current_file + 1) % num_files
                     continue
+                self._time_coord += time.time() - t
                 
 
                 patches = np.empty((this_image.shape[2],nPatchPts,nPatches),dtype=np.float32)
+                t = time.time()
                 if self.rotation:
                     patchCoords = np.dot(rots[:,:,datasize:datasize+nPatches].transpose((2,0,1)), \
                                          patchPts.reshape((1,2,nPatchPts))).reshape((nPatches,2,nPatchPts)) \
@@ -145,18 +157,25 @@ class DiskImage(object):
                     patchCoords = patchPts.reshape((2,nPatchPts,1)) + patchCenters[:,0:nPatches].reshape((2,1,nPatches))
                     for cdim in range(0,this_image.shape[2]):
                         patches[cdim,:,:] = this_image[patchCoords[0,...],patchCoords[1,...],cdim]
+                self._time_warp += time.time() - t
 
-
+                t = time.time()
                 if cnorm:
-                    patches -= np.mean(np.mean(patches,axis=1),axis=0).reshape((1,1,nPatches))
+                    patches -= np.mean(np.mean(patches,axis=0),axis=0).reshape((1,1,nPatches))
+                self._time_norm += time.time() - t
 
+                t = time.time()
                 data[datasize:datasize+nPatches,:] = patches.transpose((2,1,0)).reshape((nPatches,-1))
+                self._time_copy += time.time() - t
+
                 datasize += nPatches
                 if datasize >= batchsize:
                     break
                 current_file = (current_file + 1) % num_files
 
             data_list.append(data)
+
+#        print 'Load/Coord/Warp/Norm/Copy Time: {0}/{1}/{2}/{3}/{4}'.format(self._time_load,self._time_coord,self._time_warp,self._time_norm,self._time_copy)
         return data_list
 
 

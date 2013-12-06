@@ -1,5 +1,5 @@
 name: "mass_roads_patches"
-gpu_memory: "500M"
+gpu_memory: "900M"
 main_memory: "4G"
 
 data {

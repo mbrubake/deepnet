@@ -1,10 +1,10 @@
 name: "mass_roads"
-gpu_memory: "1G"
-main_memory: "16G"
+gpu_memory: "4G"
+main_memory: "128G"
 
 data {
   name: "train_data"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/train/sat/*.tiff"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads/train/sat/*.tiff"
   img: true
   patchsize: 64
   patchstride: 8
@@ -15,7 +15,7 @@ data {
 }
 data {
   name: "train_labels"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/train/map/*.tif"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads/train/map/*.tif"
   img: true
   patchsize: 16
   patchstride: 8
@@ -27,7 +27,7 @@ data {
 
 data {
   name: "validation_data"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/valid/sat/*.tiff"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads/valid/sat/*.tiff"
   img: true
   patchsize: 64
   patchstride: 8
@@ -37,7 +37,7 @@ data {
 }
 data {
   name: "validation_labels"
-  file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads/valid/map/*.tif"
+  file_pattern: "/u/mbrubake/Projects/map_prior/mass_roads/valid/map/*.tif"
   img: true
   patchsize: 16
   patchstride: 8 

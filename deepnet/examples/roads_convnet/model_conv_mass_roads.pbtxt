@@ -174,7 +174,7 @@ hyperparams {
 #  base_epsilon: 0.00005
 #  base_epsilon: 0.00001
   epsilon_decay: EXPONENTIAL
-  epsilon_decay_half_life: 12000
+  epsilon_decay_half_life: 50000
   initial_momentum: 0.9
   final_momentum: 0.9
   momentum_change_steps: 300000
