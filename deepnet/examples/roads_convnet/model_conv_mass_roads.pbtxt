@@ -38,9 +38,12 @@ layer {
   performance_stats {
     compute_correct_preds: true
     compute_cross_entropy: true
+    compute_MAP: true
+    compute_prec50: true
   }
   shape: 16 
   shape: 16
+  shape: 1
 }
 layer {
   name: "hidden1"
@@ -152,7 +155,7 @@ edge {
   param {
     name: "weight"
     initialization: DENSE_GAUSSIAN_SQRT_FAN_IN
-    sigma: 1.0
+    sigma: 0.1
   }
 }
 edge {
@@ -161,21 +164,24 @@ edge {
   param {
     name: "weight"
     initialization: DENSE_GAUSSIAN_SQRT_FAN_IN
-    sigma: 1.0
+    sigma: 0.1
   }
 }
 
 hyperparams {
-  base_epsilon: 0.0005
+#  base_epsilon: 0.0005
+  base_epsilon: 0.0001
+#  base_epsilon: 0.00005
 #  base_epsilon: 0.00001
   epsilon_decay: EXPONENTIAL
-  epsilon_decay_half_life: 120000
+  epsilon_decay_half_life: 12000
   initial_momentum: 0.9
   final_momentum: 0.9
   momentum_change_steps: 300000
   apply_l2_decay: true
   l2_decay: 0.0002
   activation: RECTIFIED_LINEAR
+  select_model_using_map: true
 }
 seed: 42
 
