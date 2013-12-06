@@ -31,11 +31,16 @@ class RunningStats:
     def get_std(self):
         return np.sqrt(self.M2/(self.n - 1))
 
+    def get_scalar_std(self):
+        return np.sqrt(np.mean(self.M2/(self.n - 1)))
+
     def write_stats(self,filename):
         stats = dict()
         stats['n'] = self.n
-        stats['mean'] = self.get_mean()
-        stats['std'] = self.get_std()
+        stats['full_mean'] = self.get_mean()
+        stats['full_std'] = self.get_std()
+        stats['mean'] = np.zeros_like(stats['full_mean'])
+        stats['std'] = self.get_scalar_std() * np.ones_like(stats['full_std']) 
         np.savez(filename,**stats)
  
 if __name__ == '__main__':

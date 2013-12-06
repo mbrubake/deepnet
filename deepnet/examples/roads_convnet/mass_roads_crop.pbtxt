@@ -14,6 +14,7 @@ data {
   patchrandoffset: true
   dimensions: 12288
   size: 8568832
+  stats_file:  "/u/mbrubake/Projects/map_prior/sat_patch_stats.npz"
 }
 data {
   name: "train_labels"
@@ -41,6 +42,7 @@ data {
   patchrandoffset: false
   dimensions: 12288 
   size: 113400
+  stats_file:  "/u/mbrubake/Projects/map_prior/sat_patch_stats.npz"
 }
 data {
   name: "validation_labels"
@@ -68,6 +70,7 @@ data {
   patchrandoffset: false
   dimensions: 12288 
   size: 396900
+  stats_file:  "/u/mbrubake/Projects/map_prior/sat_patch_stats.npz"
 }
 data {
   name: "test_labels"

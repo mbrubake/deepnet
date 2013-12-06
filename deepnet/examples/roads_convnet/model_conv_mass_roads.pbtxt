@@ -7,6 +7,7 @@ layer {
   is_input: true
   hyperparams {
     activation: LINEAR
+    normalize: true
   }
   data_field {
     train: "train_data"
@@ -169,8 +170,8 @@ edge {
 }
 
 hyperparams {
-#  base_epsilon: 0.0005
-  base_epsilon: 0.0001
+  base_epsilon: 0.0005
+#  base_epsilon: 0.0001
 #  base_epsilon: 0.00005
 #  base_epsilon: 0.00001
   epsilon_decay: EXPONENTIAL
