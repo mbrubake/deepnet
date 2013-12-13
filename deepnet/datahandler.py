@@ -612,7 +612,8 @@ class DataHandler(object):
       import image_datahandler as img_dh
         
       self.disk = img_dh.DiskImage(filenames, valid_filenames, numdim_list, 
-                                   patchsize, patchstride, patchnormalize, patchrotation, patchrandoffset)
+                                   patchsize, patchstride, patchnormalize, patchrotation, patchrandoffset,
+                                   randomize=randomize)
       self.cpu_cache = Cache(self.disk, cpu_capacity, numdim_list,
                              typesize = typesize, randomize=randomize,
                              verbose=self.verbose)

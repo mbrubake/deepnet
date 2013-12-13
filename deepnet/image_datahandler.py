@@ -5,17 +5,19 @@ import numpy as np
 import time
 
 class DiskImage(object):
-    def __init__(self, imgnames, validimgnames, numdim_list, patchsize, patchstride, normalization, rotation, randoff):
+    def __init__(self, imgnames, validimgnames, numdim_list, patchsize, patchstride, normalization, rotation, randoff, randomize):
         assert len(imgnames) == len(validimgnames)
         assert len(imgnames) == len(numdim_list)
         assert len(imgnames) == len(patchsize)
         assert len(imgnames) == len(normalization)
+        self.randomize = randomize
         self.num_data = len(imgnames)
         self.imgnames = imgnames
         self.validimgnames = validimgnames
         self.patchsize = patchsize
         self.patchstride = patchstride
         self._num_file_list = [len(filename_list) for filename_list in imgnames]
+        print 'num_file_list = {0}'.format(self._num_file_list)
         self._maxpos = 1e300  # Total amount of data, set to arbitrarily large number
         self.maxpatchsize = np.max(self.patchsize)
         self.normalization = normalization
