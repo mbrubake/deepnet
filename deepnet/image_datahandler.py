@@ -2,7 +2,7 @@ from scipy import misc
 from scipy import ndimage as spnd
 from itertools import product
 import numpy as np
-import time
+import time,random
 
 class DiskImage(object):
     def __init__(self, imgnames, validimgnames, numdim_list, patchsize, patchstride, normalization, rotation, randoff, randomize):
@@ -17,7 +17,11 @@ class DiskImage(object):
         self.patchsize = patchsize
         self.patchstride = patchstride
         self._num_file_list = [len(filename_list) for filename_list in imgnames]
-        print 'num_file_list = {0}'.format(self._num_file_list)
+        for i in self._num_file_list:
+            assert i == self._num_file_list[0],'Must have equal numbers of images for each modality.'
+        self.file_order = range(self._num_file_list[0])
+        if self.randomize:
+            random.shuffle(self.file_order)
         self._maxpos = 1e300  # Total amount of data, set to arbitrarily large number
         self.maxpatchsize = np.max(self.patchsize)
         self.normalization = normalization
@@ -57,10 +61,11 @@ class DiskImage(object):
             
             assert(self.numdim_list[i] == numdim_list[i])
             
-    def LoadImage(self,i,current_file = None):
+    def LoadImage(self,i,current_index = None):
         t = time.time()
-        if current_file == None:
-            current_file = self.last_read_imgnum[i]
+        if current_index == None:
+            current_index = self.last_read_imgnum[i]
+        current_file = self.file_order[current_index]
 
         if self.validimgnames[i] != None and self.validimgnames[i][current_file] != None:
             valid_image = misc.imread(self.validimgnames[i][current_file])
@@ -92,6 +97,9 @@ class DiskImage(object):
             starty = maxunrotpatchsz/2
         range1 = range(startx,this_image.shape[0] - maxunrotpatchsz/2 + 1,self.patchstride)
         range2 = range(starty,this_image.shape[1] - maxunrotpatchsz/2 + 1,self.patchstride)
+        if self.randomize:
+            random.shuffle(range1)
+            random.shuffle(range2)
         self.last_read_patch[i] = product(range1,range2)
         self.last_read_img_npatches[i] = len(range1)*len(range2)
         self._time_load += time.time() - t
