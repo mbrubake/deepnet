@@ -219,12 +219,15 @@ class Layer(Parameter):
     f = 1
     if self.hyperparams.dropout and not train:
       f = 1 / (1 - self.hyperparams.dropout_prob)
+    probActives = set([deepnet_pb2.Hyperparams.LOGISTIC, deepnet_pb2.Hyperparams.TANH, deepnet_pb2.Hyperparams.SOFTMAX, deepnet_pb2.Hyperparams.REPLICATED_SOFTMAX])
     if self.is_input:
-      visualize.display_hidden(self.data.asarray(), self.fig, title=self.name)
+      visualize.display_hidden(self.data.asarray(), self.fig, title=self.name, prob=self.proto.hyperparams.activation in probActives)
       #visualize.display_w(self.neg_sample.asarray(), 28, 10, self.state.shape[1]/10, self.fig, title=self.name, vmax=1, vmin=0)
       #visualize.show_hist(self.params['bias'].asarray(), self.fig)
+    elif self.data != None:
+      visualize.display_hidden(f*self.state.asarray(), self.fig, title=self.name, prob=self.proto.hyperparams.activation in probActives, data=self.data.asarray())
     else:
-      visualize.display_hidden(f*self.state.asarray(), self.fig, title=self.name)
+      visualize.display_hidden(f*self.state.asarray(), self.fig, title=self.name, prob=self.proto.hyperparams.activation in probActives)
       #visualize.show_hist(self.params['bias'].asarray(), self.fig)
       """
       plt.figure(self.fig)

@@ -63,6 +63,11 @@ class Parameter(object):
         fan_in = np.prod(param.dimensions[1])
       stddev = param.sigma / np.sqrt(fan_in)
       return stddev * (2 * np.random.rand(*tuple(param.dimensions)) - 1)
+    elif param.initialization == deepnet_pb2.Parameter.CONV_GAUSSIAN_GREY:
+      assert param.conv
+      assert param.dimensions[-1]%param.conv_params.num_colors == 0
+      p = param.sigma * np.random.randn(*tuple(param.dimensions[0:-1] + [param.dimensions[-1]/param.conv_params.num_colors]))
+      return np.tile(p,(1,)*len(param.dimensions) + (param.conv_params.num_colors,)).reshape(*tuple(param.dimensions))
     elif param.initialization == deepnet_pb2.Parameter.PRETRAINED:
       return self.LoadPretrained(param)
     else:

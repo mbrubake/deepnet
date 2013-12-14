@@ -28,36 +28,46 @@ def scatter(Y, s=20, c='b', fig=1):
   plt.scatter(Y[:,0], Y[:,1], s, c)
   plt.draw()
 
-def show_hist(mat, fig):
+def show_hist(mat, fig, title=None):
   plt.figure(fig)
   plt.clf()
-  plt.hist(mat.flatten(), 100)
+  if title != None:
+    plt.suptitle(title)
+  plt.hist(mat.flatten(), 100, normed=True)
   plt.draw()
 
 def show_stats(edge, fig, title):
   plt.figure(fig)
   plt.clf()
   plt.suptitle(title)
-  plt.hist(edge.params['weight'].asarray().flatten(), 100)
+  plt.hist(edge.params['weight'].asarray().flatten(), 100, normed=True)
   plt.draw()
 
-def display_hidden(state, fig, title, log=False, prob=True):
+def display_hidden(state, fig, title, log=False, prob=True,data=None):
+  if data == None:
+    numPlots = 3
+  else:
+    numPlots = 4
   plt.figure(fig)
   plt.clf()
   plt.suptitle(title)
-  plt.subplot(1, 3, 1)
-  plt.hist(state.mean(axis=1), 100)
+  plt.subplot(1, numPlots, 1)
+  plt.hist(state.mean(axis=1), 100, normed=True)
   if prob:
     plt.xlim([0, 1])
   plt.title('Mean Activation')
-  plt.subplot(1, 3, 2)
-  plt.hist(state.flatten(), 100, log=log)
+  plt.subplot(1, numPlots, 2)
+  plt.hist(state.flatten(), 100, log=log, normed=True)
   if prob:
     plt.xlim([-0.1, 1.1])
   plt.title('Activation')
-  plt.subplot(1, 3, 3)
+  plt.subplot(1, numPlots, 3)
   plt.imshow(state, cmap = plt.cm.gray, interpolation='nearest', vmax=1, vmin=0)
   plt.title('State')
+  if data != None:
+    plt.subplot(1, 4, 4)
+    plt.imshow(data, cmap = plt.cm.gray, interpolation='nearest', vmax=1, vmin=0)
+    plt.title('Data')
   plt.draw()
 
 def display_wsorted(w, s, r, c, fig, vmax=None, vmin=None, dataset='mnist',

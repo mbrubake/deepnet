@@ -47,7 +47,7 @@ class Edge(Parameter):
   def Show(self):
     if not self.hyperparams.enable_display:
       return
-    visualize.show_hist(self.params['weight'].asarray(), self.fig)
+    visualize.show_hist(self.params['weight'].asarray(), self.fig_stats, title='{0} weights'.format(self.name))
     if self.node1.is_input:
       if self.conv or self.local:
         visualize.display_convw(self.params['weight'].asarray(),
