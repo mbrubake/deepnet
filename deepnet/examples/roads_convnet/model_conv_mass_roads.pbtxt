@@ -18,6 +18,142 @@ layer {
   shape: 64
   shape: 3
 }
+edge {
+  node1: "input_layer"
+  node2: "hidden1"
+  param {
+    name: "weight"
+    initialization: CONV_GAUSSIAN_GREY
+    sigma: 0.1
+    conv: true
+    conv_params {
+      size: 16
+      stride: 4
+      padding: 8
+      num_filters: 64
+      num_colors: 3
+      max_pool: true
+      pool_size: 2
+      pool_stride: 1
+    }
+  }
+  receptive_field_width: 16
+  display_rows: 8
+  display_cols: 8
+}
+layer {
+  name: "hidden1"
+  dimensions: 16384
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
+  }
+  shape: 16
+  shape: 16
+  shape: 64
+}
+edge {
+  node1: "hidden1"
+  node2: "hidden2"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN
+    sigma: 0.01
+    conv: true
+    conv_params {
+      size: 4
+      stride: 1
+      padding: 0
+      num_filters: 112
+      num_colors: 64
+      max_pool: false
+    }
+  }
+}
+layer {
+  name: "hidden2"
+  dimensions: 18928
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
+  }
+  shape: 13
+  shape: 13
+  shape: 112
+}
+edge {
+  node1: "hidden2"
+  node2: "hidden3"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN
+    sigma: 0.01
+    conv: true
+    conv_params {
+      size: 3
+      stride: 1
+      padding: 0
+      num_filters: 80
+      num_colors: 112
+      max_pool: false
+    }
+  }
+}
+layer {
+  name: "hidden3"
+  dimensions: 9680
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
+  }
+  shape: 11
+  shape: 11
+  shape: 80
+}
+edge {
+  node1: "hidden3"
+  node2: "hidden4"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN
+    sigma: 0.01
+  }
+}
+layer {
+  name: "hidden4"
+  dimensions: 4096
+  param {
+    name: "bias"
+    initialization: CONSTANT
+  }
+  hyperparams {
+    dropout: false
+    activation: RECTIFIED_LINEAR
+  }
+  shape: 16
+  shape: 16
+}
+edge {
+  node1: "hidden4"
+  node2: "output_layer"
+  param {
+    name: "weight"
+    initialization: DENSE_GAUSSIAN
+    sigma: 0.01
+  }
+}
 layer {
   name: "output_layer"
   dimensions: 256
@@ -46,130 +182,9 @@ layer {
   shape: 16
   shape: 1
 }
-layer {
-  name: "hidden1"
-  dimensions: 9216
-  param {
-    name: "bias"
-    initialization: CONSTANT
-  }
-  hyperparams {
-    dropout: false
-    activation: RECTIFIED_LINEAR
-  }
-}
-layer {
-  name: "hidden2"
-  dimensions: 9072
-  param {
-    name: "bias"
-    initialization: CONSTANT
-  }
-  hyperparams {
-    dropout: false
-    activation: RECTIFIED_LINEAR
-  }
-}
-layer {
-  name: "hidden3"
-  dimensions: 3920
-  param {
-    name: "bias"
-    initialization: CONSTANT
-  }
-  hyperparams {
-    dropout: false
-    activation: RECTIFIED_LINEAR
-  }
-}
-layer {
-  name: "hidden4"
-  dimensions: 4096
-  param {
-    name: "bias"
-    initialization: CONSTANT
-  }
-  hyperparams {
-    dropout: false
-    activation: RECTIFIED_LINEAR
-  }
-}
-edge {
-  node1: "input_layer"
-  node2: "hidden1"
-  param {
-    name: "weight"
-    initialization: DENSE_GAUSSIAN
-    sigma: 0.01
-    conv: true
-    conv_params {
-      size: 16
-      stride: 4
-      padding: 0
-      num_filters: 64
-      num_colors: 3
-      max_pool: true
-      pool_size: 2
-      pool_stride: 1
-    }
-  }
-}
-edge {
-  node1: "hidden1"
-  node2: "hidden2"
-  param {
-    name: "weight"
-    initialization: DENSE_GAUSSIAN
-    sigma: 0.01
-    conv: true
-    conv_params {
-      size: 4
-      stride: 1
-      padding: 0
-      num_filters: 112
-      num_colors: 64
-      max_pool: false
-    }
-  }
-}
-edge {
-  node1: "hidden2"
-  node2: "hidden3"
-  param {
-    name: "weight"
-    initialization: DENSE_GAUSSIAN
-    sigma: 0.01
-    conv: true
-    conv_params {
-      size: 3
-      stride: 1
-      padding: 0
-      num_filters: 80
-      num_colors: 112
-      max_pool: false
-    }
-  }
-}
-edge {
-  node1: "hidden3"
-  node2: "hidden4"
-  param {
-    name: "weight"
-    initialization: DENSE_GAUSSIAN_SQRT_FAN_IN
-    sigma: 0.1
-  }
-}
-edge {
-  node1: "hidden4"
-  node2: "output_layer"
-  param {
-    name: "weight"
-    initialization: DENSE_GAUSSIAN_SQRT_FAN_IN
-    sigma: 0.1
-  }
-}
 
 hyperparams {
+  enable_display: true
   base_epsilon: 0.0005
 #  base_epsilon: 0.0001
 #  base_epsilon: 0.00005
