@@ -8,6 +8,7 @@ batchsize: 128
 data_proto: "mass_roads_patches.pbtxt"
 eval_after: 500
 checkpoint_after: 1000
+show_after: 250
 checkpoint_directory: "/home/mbrubake/Projects/map_prior/checkpoints"
 randomize: true
 verbose: true

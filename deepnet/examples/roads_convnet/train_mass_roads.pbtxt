@@ -1,12 +1,13 @@
 optimizer: GRADIENT_DESCENT
 stopcondition {
   all_processed: false
-  steps: 500000
+  steps: 10000000
 }
 train: true
 batchsize: 128
 data_proto: "mass_roads_crop.pbtxt"
 eval_after: 10000
+show_after: 1000
 checkpoint_after: 10000
 checkpoint_directory: "/u/mbrubake/Projects/map_prior/checkpoints"
 randomize: true
