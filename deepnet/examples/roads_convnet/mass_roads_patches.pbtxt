@@ -1,5 +1,5 @@
 name: "mass_roads_patches"
-gpu_memory: "900M"
+gpu_memory: "600M"
 main_memory: "4G"
 
 data {
@@ -7,7 +7,7 @@ data {
   file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_patches/train/sat_*.npy"
   dimensions: 12288
   size: 8568832
-  stats_file:  "/home/mbrubake/Projects/map_prior/mass_roads_patches/train/sat_patch_stats.npz"
+  stats_file:  "/home/mbrubake/Projects/map_prior/sat_patch_stats.npz"
 }
 data {
   name: "train_labels"
@@ -21,7 +21,7 @@ data {
   file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_patches/valid/sat_*.npgz"
   dimensions: 12288 
   size: 113400
-  stats_file:  "/home/mbrubake/Projects/map_prior/mass_roads_patches/train/sat_patch_stats.npz"
+  stats_file:  "/home/mbrubake/Projects/map_prior/sat_patch_stats.npz"
 }
 data {
   name: "validation_labels"
@@ -35,7 +35,7 @@ data {
   file_pattern: "/home/mbrubake/Projects/map_prior/mass_roads_patches/test/sat_*.npgz"
   dimensions: 12288 
   size: 393216
-  stats_file:  "/home/mbrubake/Projects/map_prior/mass_roads_patches/train/sat_patch_stats.npz"
+  stats_file:  "/home/mbrubake/Projects/map_prior/sat_patch_stats.npz"
 }
 data {
   name: "test_labels"
