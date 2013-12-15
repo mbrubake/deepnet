@@ -24,7 +24,7 @@ edge {
   param {
     name: "weight"
     initialization: CONV_GAUSSIAN_GREY
-    sigma: 0.1
+    sigma: 0.001
     conv: true
     conv_params {
       size: 16
