@@ -24,7 +24,7 @@ edge {
   param {
     name: "weight"
     initialization: CONV_GAUSSIAN_GREY
-    sigma: 0.001
+    sigma: 0.01
     conv: true
     conv_params {
       size: 16
@@ -185,17 +185,19 @@ layer {
 
 hyperparams {
   enable_display: true
-  base_epsilon: 0.0005
+#  base_epsilon: 0.0005
 #  base_epsilon: 0.0001
 #  base_epsilon: 0.00005
 #  base_epsilon: 0.00001
+  base_epsilon: 0.000005
   epsilon_decay: EXPONENTIAL
-  epsilon_decay_half_life: 50000
+  epsilon_decay_half_life: 100000
   initial_momentum: 0.9
   final_momentum: 0.9
   momentum_change_steps: 300000
   apply_l2_decay: true
-  l2_decay: 0.0002
+#  l2_decay: 0.0002
+  l2_decay: 0.0000001
   activation: RECTIFIED_LINEAR
   select_model_using_map: true
 }
